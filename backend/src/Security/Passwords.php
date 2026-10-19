@@ -102,19 +102,4 @@ final class Passwords
         }
         return str_starts_with($hash, '$2') ? substr($hash, 7, 22) : '';
     }
-
-    /**
-     * How a password is stored, for the admin user list: algorithm, settings and salt, with the hash cut off.
-     * "$argon2id$v=19$m=65536,t=4,p=1$<salt>$<hash>" -> "$argon2id$v=19$m=65536,t=4,p=1$<salt>$…"
-     */
-    public static function preview(string $hash): string
-    {
-        if (preg_match('/^(\$argon2[a-z]*\$v=\d+\$[^$]+\$[^$]+)\$/', $hash, $m) === 1) {
-            return $m[1] . '$…';
-        }
-        if (preg_match('/^(\$2[aby]\$\d{2}\$.{22})/', $hash, $m) === 1) {
-            return $m[1] . '…';
-        }
-        return '(hidden)';
-    }
 }

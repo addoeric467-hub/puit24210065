@@ -437,7 +437,7 @@ final class AdminService
     }
 
     /**
-     * Fields shown to admins. The full password hash never leaves the server; only a shortened preview.
+     * Fields shown to admins, including the password hash exactly as stored (never the password or the pepper).
      *
      * @param array<string,mixed> $row
      * @return array<string,mixed>
@@ -453,7 +453,7 @@ final class AdminService
             'last_login_at' => isset($row['last_login_at']) ? Util::iso((string) $row['last_login_at']) : null,
             'status' => $row['deleted_at'] === null ? 'active' : 'deleted',
             'deleted_at' => $row['deleted_at'] === null ? null : Util::iso((string) $row['deleted_at']),
-            'password_storage' => Passwords::preview((string) $row['password_hash']),
+            'password_storage' => (string) $row['password_hash'],
         ];
     }
 

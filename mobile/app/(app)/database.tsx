@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Box, Button, Message } from '../../src/components/ui';
 import { api, ApiError, DatabaseResponse } from '../../src/lib/api';
 import { describeError } from '../../src/lib/errors';
-import { BLUE, styles } from '../../src/styles';
+import { styles } from '../../src/styles';
 
 // What each table is for, shown above it.
 const about: Record<string, string> = {
@@ -122,7 +122,6 @@ export default function Database() {
       <View style={{ maxWidth: 200 }}>
         <Button title="Refresh" onPress={load} loading={loading} secondary />
       </View>
-      <Text style={[styles.small, { color: BLUE }]}>Read-only view. Changes are made on the Users and Backup pages.</Text>
     </View>
   );
 }

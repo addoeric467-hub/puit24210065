@@ -8,7 +8,8 @@ import { describeError } from '../../src/lib/errors';
 import { BLUE, styles } from '../../src/styles';
 
 // Column widths so the table lines up (the table scrolls sideways on a phone).
-const widths = { id: 45, name: 150, email: 220, role: 75, status: 80, last: 180, stored: 350, action: 80 };
+const widths = { id: 45, name: 130, email: 200, role: 75, status: 80, last: 150, action: 80 };
+const tableWidth = Object.values(widths).reduce((a, b) => a + b, 0);
 
 export default function Users() {
   const { user: me } = useAuth();
@@ -88,32 +89,34 @@ export default function Users() {
                 <Text style={[styles.cell, styles.bold, { width: widths.status }]}>Status</Text>
                 <Text style={[styles.cell, styles.bold, { width: widths.action }]}>Action</Text>
                 <Text style={[styles.cell, styles.bold, { width: widths.last }]}>Last login</Text>
-                <Text style={[styles.cell, styles.bold, { width: widths.stored }]}>Password as stored (hash, shortened)</Text>
               </View>
               {data.users.map((u) => {
                 const deleted = u.status === 'deleted';
                 return (
-                  <View key={u.id} style={[styles.tableRow, deleted && { backgroundColor: '#f6f6f6' }]}>
-                    <Text style={[styles.cell, { width: widths.id }]}>{u.id}</Text>
-                    <Text style={[styles.cell, { width: widths.name }, deleted && styles.deletedText]}>{u.name}</Text>
-                    <Text style={[styles.cell, { width: widths.email }, deleted && styles.deletedText]}>{u.email}</Text>
-                    <Text style={[styles.cell, { width: widths.role }]}>{u.role}</Text>
-                    <Text style={[styles.cell, { width: widths.status }, deleted && { color: '#b00020', fontWeight: 'bold' }]}>
-                      {deleted ? 'deleted' : 'active'}
-                    </Text>
-                    <View style={[styles.cell, { width: widths.action }]}>
-                      {u.id === me?.id ? (
-                        <Text style={styles.small}>(you)</Text>
-                      ) : (
-                        <Pressable accessibilityRole="button" disabled={busyId !== null} onPress={() => void toggle(u)}>
-                          <Text style={{ color: deleted ? BLUE : '#b00020', textDecorationLine: 'underline' }}>
-                            {busyId === u.id ? '...' : deleted ? 'Restore' : 'Delete'}
-                          </Text>
-                        </Pressable>
-                      )}
+                  <View key={u.id} style={[{ borderBottomWidth: 1, borderBottomColor: '#cccccc' }, deleted && { backgroundColor: '#f6f6f6' }]}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={[styles.cell, { width: widths.id }]}>{u.id}</Text>
+                      <Text style={[styles.cell, { width: widths.name }, deleted && styles.deletedText]}>{u.name}</Text>
+                      <Text style={[styles.cell, { width: widths.email }, deleted && styles.deletedText]}>{u.email}</Text>
+                      <Text style={[styles.cell, { width: widths.role }]}>{u.role}</Text>
+                      <Text style={[styles.cell, { width: widths.status }, deleted && { color: '#b00020', fontWeight: 'bold' }]}>
+                        {deleted ? 'deleted' : 'active'}
+                      </Text>
+                      <View style={[styles.cell, { width: widths.action }]}>
+                        {u.id === me?.id ? (
+                          <Text style={styles.small}>(you)</Text>
+                        ) : (
+                          <Pressable accessibilityRole="button" disabled={busyId !== null} onPress={() => void toggle(u)}>
+                            <Text style={{ color: deleted ? BLUE : '#b00020', textDecorationLine: 'underline' }}>
+                              {busyId === u.id ? '...' : deleted ? 'Restore' : 'Delete'}
+                            </Text>
+                          </Pressable>
+                        )}
+                      </View>
+                      <Text style={[styles.cell, { width: widths.last }]}>{formatDate(u.last_login_at)}</Text>
                     </View>
-                    <Text style={[styles.cell, { width: widths.last }]}>{formatDate(u.last_login_at)}</Text>
-                    <Text style={[styles.cell, { width: widths.stored, fontFamily: 'monospace', fontSize: 12.5 }]}>
+                    <Text selectable style={[styles.mono, { width: tableWidth, paddingHorizontal: 8, paddingBottom: 8 }]}>
+                      <Text style={[styles.bold, { fontFamily: undefined }]}>Password as stored (full hash): </Text>
                       {u.password_storage ?? '-'}
                     </Text>
                   </View>
@@ -122,9 +125,9 @@ export default function Users() {
             </View>
           </ScrollView>
           <Text style={styles.small}>
-            The real password is never stored. The "Password as stored" column shows the start of the stored value: the
-            algorithm (argon2id), its settings and the random salt. The rest of the hash is hidden here, and the pepper is
-            kept only on the server. Deleted accounts stay in the database, marked as deleted, and cannot log in.
+            The real password is never stored. The "Password as stored" line under each account shows the full stored value: the
+            algorithm (argon2id), its settings, the random salt and the hash. The pepper is kept only on the server, so the
+            hash cannot be checked without it. Deleted accounts stay in the database, marked as deleted, and cannot log in.
           </Text>
         </Box>
       ) : null}

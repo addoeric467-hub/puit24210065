@@ -26,18 +26,18 @@ test('email: normalises and validates', () => {
 });
 
 test('password: minimum length is enforced', () => {
-  assert.equal(PASSWORD_MIN, 12);
-  assert.ok(validatePassword('Abc123xyz'));
+  assert.equal(PASSWORD_MIN, 16);
+  assert.ok(validatePassword('Abc123xyz-Short'));
   assert.ok(validatePassword('A1' + 'b'.repeat(PASSWORD_MIN - 3)));
   assert.equal(validatePassword('A1' + 'b'.repeat(PASSWORD_MIN - 2)), null);
 });
 
 test('password: needs a letter and a number, and not a common password', () => {
-  assert.ok(validatePassword('OnlyLettersHere'));
-  assert.ok(validatePassword('1234567890123'));
-  assert.ok(validatePassword('Password1234'), 'common password, any case');
-  assert.ok(validatePassword('user12345678@x.com', 'USER12345678@x.com'), 'same as email');
-  assert.equal(validatePassword('Correct-Horse-9'), null);
+  assert.ok(validatePassword('OnlyLettersHereToo'));
+  assert.ok(validatePassword('12345678901234567'));
+  assert.ok(validatePassword('Password12345678'), 'common password, any case');
+  assert.ok(validatePassword('user1234567890@x.com', 'USER1234567890@x.com'), 'same as email');
+  assert.equal(validatePassword('Correct-Horse-Battery-9'), null);
 });
 
 test('password: maximum length', () => {

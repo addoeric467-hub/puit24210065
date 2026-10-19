@@ -103,7 +103,7 @@ final class Env
 {
     public const PEPPER = 'unit-test-pepper-0123456789-abcdefghijklmnop';
     public const ORIGIN = 'http://localhost:8081';
-    public const PASSWORD = 'Correct-Horse-9';
+    public const PASSWORD = 'Correct-Horse-Battery-9';
 
     /** @var array<string,string> */
     private static array $db = [];

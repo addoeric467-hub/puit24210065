@@ -6,7 +6,7 @@ use Tests\Assert;
 use Tests\Env;
 use Tests\TestApp;
 
-test('admin: an administrator can list users, and password hashes are never included', function (TestApp $app) {
+test('admin: an administrator can list users with the full stored hash, never the password', function (TestApp $app) {
     $app->createUser('admin@example.com', 'admin', Env::PASSWORD, 'Admin Person');
     $app->createUser('student@example.com', 'student', Env::PASSWORD, 'Student Person');
     $token = $app->signIn('admin@example.com');
@@ -17,16 +17,14 @@ test('admin: an administrator can list users, and password hashes are never incl
     Assert::same(2, count($res->body['users']));
     Assert::same(['admins' => 1, 'students' => 1, 'deleted' => 0, 'active_sessions' => 1], $res->body['summary']);
 
-    // Admins see how a password is stored (algorithm + salt), but never the full hash.
-    $json = json_encode($res->body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    Assert::notContains('password_hash', $json);
-    foreach ($app->pdo->query('SELECT password_hash FROM users')->fetchAll(PDO::FETCH_COLUMN) as $fullHash) {
-        Assert::notContains($fullHash, $json, 'the full hash is never sent');
-        Assert::notContains(substr($fullHash, -20), $json, 'not even the end of the hash');
-    }
+    // Admins see the password exactly as stored: the full hash, never the password itself.
     Assert::same(['id', 'name', 'email', 'role', 'created_at', 'last_login_at', 'status', 'deleted_at', 'password_storage'], array_keys($res->body['users'][0]));
-    Assert::true(str_ends_with($res->body['users'][0]['password_storage'], '…'), 'preview is cut off');
-    Assert::true(preg_match('/^\$(argon2id\$|2y\$)/', $res->body['users'][0]['password_storage']) === 1, 'shows the algorithm');
+    foreach ($res->body['users'] as $u) {
+        $stored = $app->row('SELECT password_hash FROM users WHERE id = ?', [$u['id']])['password_hash'];
+        Assert::same($stored, $u['password_storage'], 'the full stored hash is shown');
+        Assert::true(preg_match('/^\$(argon2id\$|2y\$)/', $u['password_storage']) === 1, 'shows the algorithm');
+    }
+    Assert::notContains(Env::PASSWORD, json_encode($res->body), 'the password itself is never sent');
 });
 
 test('admin: a normal user is refused (403) on admin routes', function (TestApp $app) {

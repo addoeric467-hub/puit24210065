@@ -48,10 +48,10 @@ test('register: rejects a duplicate email, including different letter case', fun
 test('register: validates name, email and password on the server', function (TestApp $app) {
     $valid = ['name' => 'Valid Name', 'email' => 'valid@example.com', 'password' => Env::PASSWORD];
     $cases = [
-        'short password' => [['password' => 'Abc123xyz'] + $valid, 'password'],
-        'no digit' => [['password' => 'OnlyLettersHere'] + $valid, 'password'],
-        'no letter' => [['password' => '1234567890123'] + $valid, 'password'],
-        'common password' => [['password' => 'Password1234'] + $valid, 'password'],
+        'short password' => [['password' => 'Abc123xyz-Short'] + $valid, 'password'],
+        'no digit' => [['password' => 'OnlyLettersHereToo'] + $valid, 'password'],
+        'no letter' => [['password' => '12345678901234567'] + $valid, 'password'],
+        'common password' => [['password' => 'Password12345678'] + $valid, 'password'],
         'too long' => [['password' => str_repeat('a1', 70)] + $valid, 'password'],
         'bad email' => [['email' => 'not-an-email'] + $valid, 'email'],
         'empty name' => [['name' => ' '] + $valid, 'name'],

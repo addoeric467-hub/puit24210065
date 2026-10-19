@@ -173,11 +173,13 @@ test('otp delivery: development mode returns the code in the response (local dem
 });
 
 test('validator: password rules', function (TestApp $app) {
-    Assert::same(null, Validator::passwordError('Correct-Horse-9'));
+    Assert::same(null, Validator::passwordError('Correct-Horse-Battery-9'));
     Assert::true(Validator::passwordError('Short1') !== null);
+    Assert::true(Validator::passwordError('Abcdefghijklmn5') !== null, '15 characters is too short');
+    Assert::same(null, Validator::passwordError('Abcdefghijklmno6'), '16 characters is the minimum');
     Assert::true(Validator::passwordError('NoDigitsHereAtAll') !== null);
-    Assert::true(Validator::passwordError('123456789012345') !== null);
-    Assert::true(Validator::passwordError('PASSWORD1234') !== null, 'common passwords are refused regardless of case');
+    Assert::true(Validator::passwordError('1234567890123456') !== null);
+    Assert::true(Validator::passwordError('PASSWORD12345678') !== null, 'common passwords are refused regardless of case');
     Assert::true(Validator::passwordError('user12345678@x.com', 'user12345678@x.com') !== null, 'password equal to the email is refused');
     Assert::same(null, Validator::passwordError(str_repeat('a1', 64)), '128 characters is the maximum');
     Assert::true(Validator::passwordError(str_repeat('a1', 65)) !== null);

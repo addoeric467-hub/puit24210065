@@ -13,7 +13,7 @@ export type User = {
   // admin list only:
   status?: 'active' | 'deleted';
   deleted_at?: string | null;
-  password_storage?: string; // algorithm + salt, hash cut off
+  password_storage?: string; // the full password hash as stored
 };
 
 export class ApiError extends Error {

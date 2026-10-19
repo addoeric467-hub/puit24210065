@@ -181,7 +181,7 @@ using any particular name, never gives admin by itself.
 
 ### Administrator pages
 
-* **Users**: every account with its role, status and how its password is stored (shortened hash). **Delete** marks an
+* **Users**: every account with its role, status and its password exactly as stored (the full hash). **Delete** marks an
   account as deleted: it stays in the database, shown struck through, but cannot log in and its sessions end.
   **Restore** makes it active again with the same password. You cannot delete your own account.
 * **Backup**: **Download backup (.sql)** saves the whole database as an SQL file. To restore it, open phpMyAdmin, select

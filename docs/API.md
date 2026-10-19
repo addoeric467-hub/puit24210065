@@ -36,7 +36,7 @@ allowed `Origin` header and `X-Client-Type: web`; otherwise the server answers `
 | POST | `/resend-otp` | none | Issue a new code for a pending sign-in |
 | GET | `/me` | session | Current user |
 | POST | `/logout` | session | Revoke the session |
-| GET | `/admin/users` | admin | List users with status and a shortened stored-password preview |
+| GET | `/admin/users` | admin | List users with status and the full stored password hash |
 | POST | `/admin/delete-user` | admin | Mark an account as deleted |
 | POST | `/admin/restore-user` | admin | Make a deleted account active again |
 | GET | `/admin/restore-points` | admin | List restore points |
@@ -54,7 +54,7 @@ endpoint answers `401` without a session and `403 forbidden` for a student.
 `200` `{ "status": "ok", "time": "2026-10-09T10:00:00+00:00" }` — `503` `{ "status": "degraded" }` if the database is unreachable.
 
 ### POST `/register`
-Request: `{ "name": "Amina Yusuf", "email": "amina@example.com", "password": "Correct-Horse-9" }`
+Request: `{ "name": "Amina Yusuf", "email": "amina@example.com", "password": "Correct-Horse-Battery-9" }`
 
 Rules: name 2–100 characters, no `<`/`>`/control characters; valid email (max 190, stored lower-case); password 12–128
 characters with at least one letter and one digit, not on a small deny-list, not equal to the email.
@@ -101,8 +101,8 @@ Logging out with an already-invalid session is not an error. `403` when a cookie
 ### GET `/admin/users?limit=100&offset=0`
 `200` `{ "users": [ {id,name,email,role,created_at,last_login_at,status,deleted_at,password_storage} ], "total": 3, "summary": { "admins": 1, "students": 1, "deleted": 1, "active_sessions": 1 } }`
 
-`status` is `active` or `deleted`. `password_storage` shows the algorithm, its settings and the salt with the hash cut
-off, for example `$argon2id$v=19$m=65536,t=4,p=1$<salt>$…`. Full password hashes are never returned.
+`status` is `active` or `deleted`. `password_storage` is the password hash exactly as stored, for example
+`$argon2id$v=19$m=65536,t=4,p=1$<salt>$<hash>`. The password itself and the pepper are never returned.
 
 ### POST `/admin/delete-user` and `/admin/restore-user`
 Request: `{ "user_id": 5 }`. Delete sets `deleted_at` (the row is kept), ends the account's sessions and cancels its

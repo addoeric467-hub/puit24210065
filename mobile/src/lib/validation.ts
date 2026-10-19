@@ -1,14 +1,14 @@
 // Client-side form validation (quick feedback only).
 // The server checks all of this again in backend/src/Validation/Validator.php.
 
-export const PASSWORD_MIN = 12;
+export const PASSWORD_MIN = 16;
 export const PASSWORD_MAX = 128;
 
 // Same list as the server.
 const COMMON_PASSWORDS = [
-  'password1234', 'password12345', 'password123456', 'passw0rd1234', 'qwerty123456',
-  'qwertyuiop12', '123456789012', 'letmein12345', 'welcome12345', 'admin1234567',
-  'iloveyou1234', 'abc123456789',
+  'password12345678', 'password123456789', 'passw0rd12345678', 'passwordpassword1',
+  'qwerty1234567890', 'qwertyuiop123456', 'letmein123456789', 'welcome123456789',
+  'admin12345678901', 'iloveyou12345678', 'abcd1234abcd1234', 'abc1234567890123',
 ];
 
 export function normalizeEmail(value: string): string {

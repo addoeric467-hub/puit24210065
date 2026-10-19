@@ -98,7 +98,7 @@ Design decisions:
 
 **Registration** (`POST /api/register`). The client validates the form first (name length, email format, password rules,
 matching confirmation) to give instant feedback. The server then validates the same rules again, because client checks
-can be bypassed. The password must be 12 to 128 characters long, contain at least one letter and one digit, must not be a
+can be bypassed. The password must be 16 to 128 characters long, contain at least one letter and one digit, must not be a
 very common password, and must not equal the email address. The email is converted to lower case; if an account with
 that email already exists the server answers `409`. The role of a new account is always `student`; the request body cannot
 choose a role.
@@ -273,7 +273,7 @@ scrolls sideways on narrow screens. Forms show a loading state on the button, fi
 | Correct and incorrect password; identical generic errors for unknown email | `login_and_otp.php` |
 | OTP success, wrong code, attempt limit, expiry (exactly 300 s), reuse, replacement, resend, delivery failure; hashes only in the database | `login_and_otp.php` |
 | Session creation, invalid and expired sessions, logout and revocation, web cookie flow and CSRF checks | `login_and_otp.php` |
-| Admin can list users; normal user gets 403; anonymous gets 401; role comes from the database; no hashes in output | `authorization.php` |
+| Admin can list users; normal user gets 403; anonymous gets 401; role comes from the database; the full stored hash is shown, never the password | `authorization.php` |
 | CORS (allowed origin, rejected origin, never `*`), 404/405/400/413/415, security headers, rate limits (account, IP, registration, OTP guessing) | `http_and_abuse.php` |
 | Configuration errors handled safely (missing/short/placeholder pepper, dev OTP in production, wildcard CORS, insecure cookies, bad SMTP, database down) and no dev OTP in production responses | `configuration.php` |
 | Every admin endpoint refuses students (403) and visitors (401); deleting marks the account, ends its sessions and blocks login; restoring; no self-delete; CSRF headers on cookie actions; restore points change only roles and deleted status; full backup contents; reports counts; database view (all six tables, hashes only, no password or pepper); password demo (different salts, pepper never shown, nothing saved) | `admin_tools.php` |
@@ -334,8 +334,8 @@ responses (headers, cookies, `public/index.php`). Two further checks covered tha
   code, wrong code with attempts remaining, correct code, code reuse refused, bearer-token session, normal user refused
   on the admin route (403), anonymous refused (401), logout and revocation, CORS for allowed and unknown origins, a
   browser sign-in from a disallowed origin refused, the `HttpOnly; SameSite=Lax` session cookie, promotion with the real
-  `bin/set-role.php`, the admin user list without password hashes, and cookie logout refused without the CSRF headers.
-* **Browser test (74 passed, 0 failed):** the web build was opened in a headless Edge browser and driven through a
+  `bin/set-role.php`, the admin user list, and cookie logout refused without the CSRF headers.
+* **Browser test (76 passed, 0 failed):** the web build was opened in a headless Edge browser and driven through a
   script in three sessions (desktop student, phone-sized administrator, desktop administrator) against the real PHP API.
   Besides the login checks below, it deletes and restores an account on the Users page, downloads a full backup, saves
   and applies a restore point, opens the Reports and Database pages, runs the Password demo, and confirms that a student is refused
@@ -373,7 +373,7 @@ The deployed site at https://puit24210065.vercel.app was tested on 11 October 20
 * **Second round (18 October 2026), after adding the administrator features:** before upgrading, a copy of all live
   data was saved; then the upgrade script `002_student_role_backup_reports.sql` was applied to the live database and the
   new version was deployed. The 17 live checks passed again. A temporary administrator account was then used for 12 more
-  live checks, all passed: the emailed code was accepted; the user list showed the Argon2id preview; a restore point was
+  live checks, all passed: the emailed code was accepted; the user list showed the Argon2id hashes; a restore point was
   saved; a test account was deleted and could no longer log in; applying the restore point brought it back (configuration
   only); a full backup was downloaded; the reports counted these actions; the password demo used Argon2id, gave two
   different salts and refused the password without the pepper; and the restored account could log in again. Finally the
@@ -406,7 +406,7 @@ online it is emailed.<br><img src="docs/screenshots/04-verify-code.png" width="5
 
 <p><b>Figure 8.</b> A standard user who opens the admin page by typing its address is refused by the server (403).<br><img src="docs/screenshots/08-admin-denied.png" width="560"></p>
 
-<p><b>Figure 9.</b> The Users page for an administrator. Only a shortened preview of each stored hash is sent.<br><img src="docs/screenshots/09-admin-users.png" width="560"></p>
+<p><b>Figure 9.</b> The Users page for an administrator. Under each account is its password exactly as stored (the full hash); the password itself is never stored.<br><img src="docs/screenshots/09-admin-users.png" width="560"></p>
 
 <p><b>Figure 10.</b> The dashboard at phone width.<br><img src="docs/screenshots/10-phone-dashboard.png" width="230"></p>
 
