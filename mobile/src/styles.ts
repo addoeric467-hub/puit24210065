@@ -86,5 +86,8 @@ export const styles = StyleSheet.create({
   tableHead: { backgroundColor: '#eeeeee' },
   cell: { padding: 8, fontSize: 14, color: '#222222' },
   deletedText: { color: '#888888', textDecorationLine: 'line-through' },
+  tab: { borderWidth: 1, borderColor: BLUE, borderRadius: 3, paddingVertical: 6, paddingHorizontal: 10, backgroundColor: '#ffffff' },
+  tabActive: { backgroundColor: BLUE },
+  tabText: { color: BLUE, fontSize: 14 },
   mono: { fontFamily: 'monospace', fontSize: 12.5, color: '#222222' },
 });

@@ -29,6 +29,7 @@ test('admin tools: every admin endpoint refuses students (403) and visitors (401
         ['POST', '/api/admin/restore-points/apply', ['id' => 1]],
         ['GET', '/api/admin/backup', null],
         ['GET', '/api/admin/reports', null],
+        ['GET', '/api/admin/database', null],
         ['POST', '/api/admin/password-demo', ['password' => 'x']],
     ];
     foreach ($endpoints as [$method, $path, $body]) {
@@ -221,4 +222,29 @@ test('password demo: same password, different salt, different hash; the pepper i
     Assert::same(2, $app->count('users'), 'nothing was saved');
     Assert::same(0, (int) $app->row("SELECT COUNT(*) AS n FROM auth_events WHERE detail LIKE '%Demo-Password%'")['n'], 'the sample is not logged');
     Assert::same(422, $app->request('POST', '/api/admin/password-demo', ['password' => ''], $app->bearer($admin))->status);
+});
+
+/* --------------------------------------------------------------- database view */
+
+test('database view: admins see every table as stored; passwords only as hashes, never the pepper', function (TestApp $app) {
+    [$admin] = adminAndStudent($app);
+    $res = $app->request('GET', '/api/admin/database', null, $app->bearer($admin));
+    Assert::same(200, $res->status);
+
+    $byName = [];
+    foreach ($res->body['tables'] as $table) {
+        $byName[$table['name']] = $table;
+    }
+    Assert::same(['users', 'otp_challenges', 'sessions', 'rate_limits', 'auth_events', 'restore_points'], array_keys($byName));
+    Assert::same(2, $byName['users']['row_count']);
+    Assert::true(in_array('password_hash', $byName['users']['columns'], true));
+    Assert::true(in_array('token_hash', $byName['sessions']['columns'], true));
+    Assert::same([], $byName['restore_points']['rows'], 'an empty table still lists its columns');
+    Assert::true(in_array('label', $byName['restore_points']['columns'], true));
+
+    $hash = $app->row("SELECT password_hash FROM users WHERE email = 'student@example.com'")['password_hash'];
+    $json = json_encode($res->body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    Assert::contains($hash, $json, 'the stored hash is shown exactly as in the database');
+    Assert::notContains(Env::PASSWORD, $json, 'no plain passwords exist to show');
+    Assert::notContains(Env::PEPPER, $json, 'the pepper is not in the database');
 });

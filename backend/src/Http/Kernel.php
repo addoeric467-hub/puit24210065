@@ -85,6 +85,7 @@ final class Kernel
             '/admin/restore-points/apply' => ['POST' => fn(): Response => $this->adminAction($request, fn(array $a, array $in) => $this->admin->applyRestorePoint($a, $in['id'] ?? null, $request->ip) + ['message' => 'Restore point applied. Only roles and deleted status were changed.'])],
             '/admin/backup' => ['GET' => fn(): Response => $this->adminRead($request, fn(array $a) => $this->admin->backup($a, $request->ip))],
             '/admin/reports' => ['GET' => fn(): Response => $this->adminRead($request, fn() => $this->admin->reports())],
+            '/admin/database' => ['GET' => fn(): Response => $this->adminRead($request, fn() => $this->admin->database())],
             '/admin/password-demo' => ['POST' => fn(): Response => $this->adminAction($request, fn(array $a, array $in) => $this->admin->passwordDemo($a, $in['password'] ?? null))],
         ];
 

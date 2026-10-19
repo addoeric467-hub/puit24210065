@@ -44,6 +44,7 @@ allowed `Origin` header and `X-Client-Type: web`; otherwise the server answers `
 | POST | `/admin/restore-points/apply` | admin | Apply a restore point |
 | GET | `/admin/backup` | admin | Full database backup as SQL |
 | GET | `/admin/reports` | admin | Reports from the event log |
+| GET | `/admin/database` | admin | Every table as stored (row counts and newest 50 rows, read-only) |
 | POST | `/admin/password-demo` | admin | Salt and pepper demonstration (nothing saved) |
 
 "admin" means a valid session whose user has the role `admin`, read from the database on every request. Every admin

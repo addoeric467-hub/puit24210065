@@ -39,6 +39,7 @@ export default function Dashboard() {
           <Link href="/admin" style={[styles.link, { marginTop: 4 }]}>Users: view, delete or restore accounts</Link>
           <Link href="/backup" style={[styles.link, { marginTop: 8 }]}>Backup and restore points</Link>
           <Link href="/reports" style={[styles.link, { marginTop: 8 }]}>Reports</Link>
+          <Link href="/database" style={[styles.link, { marginTop: 8 }]}>Database (all tables)</Link>
           <Link href="/password-demo" style={[styles.link, { marginTop: 8 }]}>Password demo (salt and pepper)</Link>
         </Box>
       ) : null}

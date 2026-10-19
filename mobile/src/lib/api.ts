@@ -158,6 +158,10 @@ export type ReportsResponse = {
   recent_events: { time: string; event: string; email: string | null; detail: string | null; ip: string | null }[];
 };
 
+export type DatabaseTable = { name: string; row_count: number; columns: string[]; rows: (string | null)[][] };
+
+export type DatabaseResponse = { tables: DatabaseTable[]; shown_rows_per_table: number };
+
 export type PasswordDemoResponse = {
   algorithm: string;
   peppered_preview: string;
@@ -197,6 +201,7 @@ export const api = {
     }),
   backup: () => apiRequest<BackupResponse>('/admin/backup'),
   reports: () => apiRequest<ReportsResponse>('/admin/reports'),
+  database: () => apiRequest<DatabaseResponse>('/admin/database'),
   passwordDemo: (password: string) =>
     apiRequest<PasswordDemoResponse>('/admin/password-demo', { method: 'POST', body: { password } }),
 };

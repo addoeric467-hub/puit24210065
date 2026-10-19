@@ -32,7 +32,7 @@ login-auth-assignment/
 └─ REPORT.md           the written report for submission
 ```
 
-> **Test status:** the backend suite (74 tests) passes when run with PHP 8.3 in WebAssembly against SQLite, and
+> **Test status:** the backend suite (75 tests) passes when run with PHP 8.3 in WebAssembly against SQLite, and
 > the web app passes an end-to-end browser test against that real PHP API (see [REPORT.md](REPORT.md), section 14).
 > The online version, **https://puit24210065.vercel.app**, runs the same PHP code on real MySQL (Aiven) with emailed
 > codes, and sign-in works there. The test suite has not yet been run against MySQL: run `php tests/run.php` with
@@ -171,7 +171,7 @@ cd backend
 php bin/set-role.php you@example.com admin
 ```
 
-Sign in again (or just reload the page) and the administrator menu (Users, Backup, Reports, Password demo) appears. To
+Sign in again (or just reload the page) and the administrator menu (Users, Backup, Reports, Database, Password demo) appears. To
 demote: `php bin/set-role.php you@example.com student`. The role is read from the database on every request, so a change
 takes effect immediately.
 
@@ -190,6 +190,9 @@ using any particular name, never gives admin by itself.
   puts that back without changing names, emails, passwords or newer accounts.
 * **Reports**: account totals, successful logins per day, counts of security events (failed logins, wrong codes, admin
   actions) and recent activity. Use **Print / save as PDF** in the browser to keep a copy.
+* **Database**: every table (users, otp_challenges, sessions, rate_limits, auth_events, restore_points) exactly as
+  stored, with its row count and the newest 50 rows. Passwords, session tokens and codes appear only as hashes. The page
+  is read-only.
 * **Password demo**: type a sample password to see the pepper step, the random salt, the hash, and that the same password
   hashed twice gives different results. Nothing typed there is saved.
 
@@ -220,7 +223,7 @@ compiled to WebAssembly, inside Node.js, so nothing needs to be installed except
 ```powershell
 cd tools\wasm-runner
 npm install
-npm test                                          # runs backend/tests (74 tests)
+npm test                                          # runs backend/tests (75 tests)
 npm run api -- --admin=you@example.com            # real PHP API on http://localhost:8000/api
 ```
 

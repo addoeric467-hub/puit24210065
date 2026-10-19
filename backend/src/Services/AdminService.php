@@ -289,6 +289,42 @@ final class AdminService
         return (string) $this->pdo->quote((string) $value);
     }
 
+    /* ------------------------------------------------------------- database view */
+
+    /**
+     * Read-only view of every table for the admin "Database" page: row counts, columns and the latest rows,
+     * exactly as stored (passwords, tokens and codes appear only as hashes). Same data an admin can already
+     * download as a backup.
+     *
+     * @return array<string,mixed>
+     */
+    public function database(): array
+    {
+        $tables = [];
+        foreach (self::BACKUP_TABLES as $table) {
+            $rows = $this->pdo->query("SELECT * FROM `$table` ORDER BY 1 DESC LIMIT 50")->fetchAll();
+            $columns = $rows !== [] ? array_keys($rows[0]) : $this->columnsOf($table);
+            $tables[] = [
+                'name' => $table,
+                'row_count' => $this->count("SELECT COUNT(*) FROM `$table`"),
+                'columns' => $columns,
+                'rows' => array_map(fn(array $r): array => array_map(fn($v) => $v === null ? null : (string) $v, array_values($r)), $rows),
+            ];
+        }
+        return ['tables' => $tables, 'shown_rows_per_table' => 50];
+    }
+
+    /** @return list<string> column names of an empty table */
+    private function columnsOf(string $table): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM `$table` LIMIT 0");
+        $columns = [];
+        for ($i = 0; $i < $stmt->columnCount(); $i++) {
+            $columns[] = (string) ($stmt->getColumnMeta($i)['name'] ?? '');
+        }
+        return $columns;
+    }
+
     /* ------------------------------------------------------------------- reports */
 
     /** @return array<string,mixed> */

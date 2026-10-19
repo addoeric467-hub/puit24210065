@@ -22,6 +22,7 @@ export function Page({ children }: { children: React.ReactNode }) {
                 <Link href="/admin" style={styles.navLink}>Users</Link>
                 <Link href="/backup" style={styles.navLink}>Backup</Link>
                 <Link href="/reports" style={styles.navLink}>Reports</Link>
+                <Link href="/database" style={styles.navLink}>Database</Link>
                 <Link href="/password-demo" style={styles.navLink}>Password demo</Link>
               </>
             ) : null}
